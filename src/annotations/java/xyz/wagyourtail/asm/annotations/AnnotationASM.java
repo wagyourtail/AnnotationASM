@@ -1,9 +1,10 @@
 package xyz.wagyourtail.asm.annotations;
 
 import xyz.wagyourtail.asm.annotations.ref.ClassRef;
+import xyz.wagyourtail.asm.annotations.ref.MethodRef;
 
 public @interface AnnotationASM {
-    ClassRef owner() default @ClassRef(ClassRef.class);
+    ClassRef owner() default @ClassRef();
 
     ArrayValue[] arrayValues() default {};
 
@@ -11,24 +12,30 @@ public @interface AnnotationASM {
 
     @interface KeyValue {
         String key();
-        Value value();
+
+        @MethodASM(
+            desc = @MethodRef.Desc(
+                returnType = @ClassRef(Value.class), args = {}
+            )
+        )
+        String value();
     }
 
     @interface ArrayValue {
         String name();
 
-        /**
-         * @see Value
-         * @return
-         */
-        Value[] value();
+        @MethodASM(
+            desc = @MethodRef.Desc(
+                returnType = @ClassRef(Value[].class), args = {}
+            )
+        )
+        String[] value();
     }
 
     @interface Value {
-        //TODO: use this library to insert this method, it's valid in jvm, but not java
-        // AnnotationValue annotationValue() default @AnnotationASM(owner = @ClassRef);
+        AnnotationASM annotationValue() default @AnnotationASM(owner = @ClassRef);
 
-        ClassRef classRef() default @ClassRef(ClassRef.class);
+        ClassRef classRef() default @ClassRef();
 
         String stringValue() default "";
 
@@ -39,6 +46,8 @@ public @interface AnnotationASM {
         float floatValue() default 0;
 
         double doubleValue() default 0;
+
+        boolean booleanValue() default false;
     }
 
 }

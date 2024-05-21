@@ -14,7 +14,7 @@ public @interface MethodRef {
      * The method descriptor to use.
      * @return
      */
-    Desc desc() default @Desc(returnType = @ClassRef(ClassRef.class), args = {});
+    Desc desc() default @Desc(returnType = @ClassRef(), args = {});
 
     @interface Desc {
         ClassRef returnType();

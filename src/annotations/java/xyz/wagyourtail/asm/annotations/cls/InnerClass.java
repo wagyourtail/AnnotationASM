@@ -3,9 +3,9 @@ package xyz.wagyourtail.asm.annotations.cls;
 import xyz.wagyourtail.asm.annotations.ref.ClassRef;
 
 public @interface InnerClass {
-    String name();
+    ClassRef name();
 
-    ClassRef outerName() default @ClassRef(ClassRef.class);
+    ClassRef outerName() default @ClassRef();
 
     String innerName() default "";
 

@@ -6,6 +6,13 @@ import xyz.wagyourtail.asm.annotations.ref.ClassRef;
 import xyz.wagyourtail.asm.annotations.ref.FieldRef;
 import xyz.wagyourtail.asm.annotations.ref.MethodRef;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.CLASS)
 public @interface ClassASM {
     /**
      * if the class version should be changed.
@@ -30,7 +37,7 @@ public @interface ClassASM {
     /**
      * if the class superName should
      */
-    ClassRef superName() default @ClassRef(ClassRef.class);
+    ClassRef superName() default @ClassRef();
 
     /**
      * interfaces to add to the class.
@@ -45,7 +52,7 @@ public @interface ClassASM {
     /**
      * if the class outerClass should be changed.
      */
-    ClassRef outerClass() default @ClassRef(ClassRef.class);
+    ClassRef outerClass() default @ClassRef();
 
     /**
      * if the outerMethod should be changed.
@@ -75,7 +82,7 @@ public @interface ClassASM {
     /**
      * if any visible type annotations should be added.
      */
-    AnnotationASM[] addVisibleTypeAnnotations() default {};
+    TypeAnnotationASM[] addVisibleTypeAnnotations() default {};
 
     /**
      * if any visible type annotations should be removed.
@@ -85,7 +92,7 @@ public @interface ClassASM {
     /**
      * if any invisible type annotations should be added.
      */
-    AnnotationASM[] addInvisibleTypeAnnotations() default {};
+    TypeAnnotationASM[] addInvisibleTypeAnnotations() default {};
 
     /**
      * if any invisible type annotations should be removed.
@@ -105,7 +112,7 @@ public @interface ClassASM {
     /**
      * if the nestHost should be changed.
      */
-    ClassRef nestHost() default @ClassRef(ClassRef.class);
+    ClassRef nestHost() default @ClassRef();
 
     /**
      * if any nestMembers should be added.

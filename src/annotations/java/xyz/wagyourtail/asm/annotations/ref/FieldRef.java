@@ -9,6 +9,11 @@ public @interface FieldRef {
      */
     ClassRef desc();
 
+    /**
+     * The field descriptor to use, if present desc is ignored.
+     */
+    String descString() default "";
+
     @interface Qualified {
         ClassRef owner();
         FieldRef field();
