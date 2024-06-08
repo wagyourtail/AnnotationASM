@@ -3,7 +3,7 @@ plugins {
     `java-gradle-plugin`
 }
 
-group = "xyz.wagyourtail.unimined"
+group = "xyz.wagyourtail.annotationasm"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -47,24 +47,6 @@ dependencies {
     implementation(gradleApi())
 }
 
-tasks.jar {
-
-    from(projectDir.parentFile.resolve("LICENSE.md"))
-
-    manifest {
-        attributes.putAll(
-            mapOf(
-                "Manifest-Version" to "1.0",
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-            )
-        )
-    }
-
-    isPreserveFileTimestamps = false
-    isReproducibleFileOrder = true
-}
-
 val processAnnotations by tasks.registering(JavaExec::class) {
     dependsOn(tasks.getByName("annotationsClasses"))
     classpath = processors.runtimeClasspath
@@ -81,6 +63,29 @@ val annotationsJar by tasks.registering(Jar::class) {
     dependsOn(processAnnotations)
     archiveBaseName.set("annotationasm-annotations")
     from(processAnnotations.get().outputs.files)
+}
+
+tasks.jar {
+    from(projectDir.parentFile.resolve("LICENSE.md"))
+    from(processAnnotations.get().outputs.files)
+    from(processors.output)
+
+    manifest {
+        attributes.putAll(
+            mapOf(
+                "Manifest-Version" to "1.0",
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version,
+            )
+        )
+    }
+
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+}
+
+tasks.assemble {
+    dependsOn(annotationsJar)
 }
 
 tasks.test {
