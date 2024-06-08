@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     `java-gradle-plugin`
+    `maven-publish`
 }
 
 group = "xyz.wagyourtail.annotationasm"
@@ -90,4 +91,25 @@ tasks.assemble {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+gradlePlugin {
+    plugins {
+        create("annotationasm") {
+            id = "xyz.wagyourtail.annotationasm"
+            implementationClass = "xyz.wagyourtail.asm.AnnotationASMPlugin"
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("annotations") {
+            groupId = project.group.toString()
+            artifactId = "annotationasm-annotations"
+            version = project.version.toString()
+
+            artifact(tasks.getByName("annotationsJar"))
+        }
+    }
 }
