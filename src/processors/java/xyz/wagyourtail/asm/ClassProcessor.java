@@ -3,7 +3,11 @@ package xyz.wagyourtail.asm;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 import xyz.wagyourtail.asm.annotations.ClassASM;
+import xyz.wagyourtail.asm.annotations.FieldASM;
+import xyz.wagyourtail.asm.annotations.MethodASM;
 import xyz.wagyourtail.asm.parsers.AnnotationParser;
 import xyz.wagyourtail.asm.parsers.FieldParser;
 import xyz.wagyourtail.asm.parsers.MethodParser;
@@ -14,17 +18,12 @@ import xyz.wagyourtail.asm.parsers.ref.ClassRefParser;
 import xyz.wagyourtail.asm.parsers.ref.FieldRefParser;
 import xyz.wagyourtail.asm.parsers.ref.MethodRefParser;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class ClassProcessor {
 
-    public final ClassNode classNode;
-
-    public ClassProcessor(ClassNode classNode) {
-        this.classNode = classNode;
-    }
-
-    private void processClassASM(AnnotationNode annotation) {
+    private static void processClassASM(AnnotationNode annotation, ClassNode classNode) {
         for (int i = 0; i < annotation.values.size(); i += 2) {
             String key = (String) annotation.values.get(i);
             Object value = annotation.values.get(i + 1);
@@ -155,10 +154,46 @@ public class ClassProcessor {
         }
     }
 
-    public ClassNode process() {
-        for (AnnotationNode annotation : classNode.invisibleAnnotations) {
-            if (annotation.desc.equals(Type.getType(ClassASM.class).getDescriptor())) {
-                processClassASM(annotation);
+    public static ClassNode process(ClassNode classNode) {
+        if (classNode.invisibleAnnotations != null) {
+            Iterator<AnnotationNode> iter = classNode.invisibleAnnotations.iterator();
+            while (iter.hasNext()) {
+                AnnotationNode annotation = iter.next();
+                if (annotation.desc.equals(Type.getType(ClassASM.class).getDescriptor())) {
+                    processClassASM(annotation, classNode);
+                    iter.remove();
+                    break;
+                }
+            }
+        }
+        if (classNode.methods != null) {
+            for (MethodNode method : classNode.methods) {
+                if (method.invisibleAnnotations != null) {
+                    Iterator<AnnotationNode> iter = method.invisibleAnnotations.iterator();
+                    while (iter.hasNext()) {
+                        AnnotationNode annotation = iter.next();
+                        if (annotation.desc.equals(Type.getType(MethodASM.class).getDescriptor())) {
+                            MethodParser.parseMethodASM(annotation, method);
+                            iter.remove();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (classNode.fields != null) {
+            for (FieldNode field : classNode.fields) {
+                if (field.invisibleAnnotations != null) {
+                    Iterator<AnnotationNode> iter = field.invisibleAnnotations.iterator();
+                    while (iter.hasNext()) {
+                        AnnotationNode annotation = iter.next();
+                        if (annotation.desc.equals(Type.getType(FieldASM.class).getDescriptor())) {
+                            FieldParser.parseFieldASM(annotation, field);
+                            iter.remove();
+                            break;
+                        }
+                    }
+                }
             }
         }
         return classNode;

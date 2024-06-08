@@ -1,10 +1,11 @@
 package xyz.wagyourtail.asm.annotations;
 
 import xyz.wagyourtail.asm.annotations.ref.ClassRef;
+import xyz.wagyourtail.asm.annotations.ref.EnumRef;
 import xyz.wagyourtail.asm.annotations.ref.MethodRef;
 
 public @interface AnnotationASM {
-    ClassRef owner() default @ClassRef();
+    ClassRef owner();
 
     ArrayValue[] arrayValues() default {};
 
@@ -22,7 +23,7 @@ public @interface AnnotationASM {
     }
 
     @interface ArrayValue {
-        String name();
+        String key();
 
         @MethodASM(
             desc = @MethodRef.Desc(
@@ -36,6 +37,8 @@ public @interface AnnotationASM {
         AnnotationASM annotationValue() default @AnnotationASM(owner = @ClassRef);
 
         ClassRef classRef() default @ClassRef();
+
+        EnumRef enumRef() default @EnumRef(owner = @ClassRef, name = "");
 
         String stringValue() default "";
 

@@ -12,14 +12,24 @@ repositories {
 
 val annotations by sourceSets.creating
 
+val processors by sourceSets.creating {
+    compileClasspath += sourceSets.main.get().compileClasspath + annotations.output
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath + annotations.output
+}
+
 sourceSets.main {
-    compileClasspath += annotations.output
-    runtimeClasspath += annotations.output
+    compileClasspath += annotations.output + processors.output
+    runtimeClasspath += annotations.output + processors.output
+}
+
+base {
+    archivesName.set("annotationasm")
 }
 
 java {
+
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
@@ -53,6 +63,24 @@ tasks.jar {
 
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true
+}
+
+val processAnnotations by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.getByName("annotationsClasses"))
+    classpath = processors.runtimeClasspath
+    mainClass = "xyz.wagyourtail.asm.PathProcessor"
+    val output = temporaryDir.resolve("annotations")
+    outputs.dir(output)
+    args = listOf(
+        annotations.output.classesDirs.files.joinToString(File.pathSeparator) { it.absolutePath },
+        output.absolutePath
+    )
+}
+
+val annotationsJar by tasks.registering(Jar::class) {
+    dependsOn(processAnnotations)
+    archiveBaseName.set("annotationasm-annotations")
+    from(processAnnotations.get().outputs.files)
 }
 
 tasks.test {

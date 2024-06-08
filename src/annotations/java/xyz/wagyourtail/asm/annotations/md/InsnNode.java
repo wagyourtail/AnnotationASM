@@ -1,6 +1,7 @@
 package xyz.wagyourtail.asm.annotations.md;
 
 import org.objectweb.asm.Opcodes;
+import xyz.wagyourtail.asm.annotations.AnnotationASM;
 import xyz.wagyourtail.asm.annotations.md.insn.*;
 import xyz.wagyourtail.asm.annotations.md.shared.Handle;
 import xyz.wagyourtail.asm.annotations.ref.ClassRef;
@@ -118,7 +119,9 @@ public @interface InsnNode {
      */
     InsnAnnotation annotation() default @InsnAnnotation(
         typeRef = 0,
-        desc = @ClassRef()
+        annotation = @AnnotationASM(
+            owner = @ClassRef()
+        )
     );
 
     /**
@@ -137,7 +140,6 @@ public @interface InsnNode {
     LocalVariable localVariable() default @LocalVariable(
         name = "",
         desc = @ClassRef(),
-        signature = "",
         startLabel = "",
         endLabel = "",
         index = 0
