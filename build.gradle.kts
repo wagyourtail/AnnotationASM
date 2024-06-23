@@ -23,29 +23,19 @@ sourceSets.main {
     runtimeClasspath += annotations.output + processors.output
 }
 
+sourceSets.test {
+    compileClasspath += processors.output
+    runtimeClasspath += processors.output
+}
+
 base {
     archivesName.set("annotationasm")
 }
 
 java {
-
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
-}
-
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-
-    val annotationsImplementation by configurations.getting
-
-    // just for Opcodes, really
-    annotationsImplementation(implementation("org.ow2.asm:asm:9.7")!!)
-    implementation("org.ow2.asm:asm-commons:9.7")
-    implementation("org.ow2.asm:asm-tree:9.7")
-
-    implementation(gradleApi())
 }
 
 val processAnnotations by tasks.registering(JavaExec::class) {
@@ -55,9 +45,24 @@ val processAnnotations by tasks.registering(JavaExec::class) {
     val output = temporaryDir.resolve("annotations")
     outputs.dir(output)
     args = listOf(
-        annotations.output.classesDirs.files.joinToString(File.pathSeparator) { it.absolutePath },
+        annotations.output.files.joinToString(File.pathSeparator) { it.absolutePath },
         output.absolutePath
     )
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(processAnnotations.get().outputs.files)
+
+    val annotationsImplementation by configurations.getting
+
+    // just for Opcodes, really
+    annotationsImplementation(implementation("org.ow2.asm:asm:9.7")!!)
+    implementation("org.ow2.asm:asm-commons:9.7")
+    implementation("org.ow2.asm:asm-tree:9.7")
+
+    implementation(gradleApi())
 }
 
 val annotationsJar by tasks.registering(Jar::class) {
@@ -85,12 +90,26 @@ tasks.jar {
     isReproducibleFileOrder = true
 }
 
-tasks.assemble {
-    dependsOn(annotationsJar)
+val processTest by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.getByName("testClasses"))
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass = "xyz.wagyourtail.asm.PathProcessor"
+    val output = temporaryDir.resolve("test")
+    outputs.dir(output)
+    args = listOf(
+        sourceSets.test.get().output.files.joinToString(File.pathSeparator) { it.absolutePath },
+        output.absolutePath
+    )
 }
 
 tasks.test {
+    dependsOn(processTest)
     useJUnitPlatform()
+    classpath = sourceSets.test.get().runtimeClasspath - sourceSets.test.get().output + processTest.get().outputs.files
+}
+
+tasks.assemble {
+    dependsOn(annotationsJar)
 }
 
 gradlePlugin {

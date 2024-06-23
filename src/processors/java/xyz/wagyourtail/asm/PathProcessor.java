@@ -7,10 +7,7 @@ import org.objectweb.asm.tree.ClassNode;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.stream.Stream;
 
 public class PathProcessor {
@@ -39,18 +36,22 @@ public class PathProcessor {
                         Files.createDirectories(outputRoot.resolve(inputRoot.relativize(parent).toString()));
                     }
 
-                    ClassReader cr = new ClassReader(Files.newInputStream(path));
-                    ClassNode classNode = new ClassNode();
-                    cr.accept(classNode, 0);
+                    if (path.getFileName().toString().endsWith(".class")) {
+                        ClassReader cr = new ClassReader(Files.newInputStream(path));
+                        ClassNode classNode = new ClassNode();
+                        cr.accept(classNode, 0);
 
-                    ClassProcessor.process(classNode);
+                        ClassProcessor.process(classNode);
 
-                    ClassWriter cw = new ClassWriter(cr, 0);
-                    classNode.accept(cw);
+                        ClassWriter cw = new ClassWriter(cr, 0);
+                        classNode.accept(cw);
 
-                    Path output = outputRoot.resolve(inputRoot.relativize(path).toString());
-                    Files.write(output, cw.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
+                        Path output = outputRoot.resolve(inputRoot.relativize(path).toString());
+                        Files.write(output, cw.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                    } else {
+                        Path output = outputRoot.resolve(inputRoot.relativize(path).toString());
+                        Files.copy(path, output, StandardCopyOption.REPLACE_EXISTING);
+                    }
                 } catch (IOException exception) {
                     throw new UncheckedIOException(exception);
                 }

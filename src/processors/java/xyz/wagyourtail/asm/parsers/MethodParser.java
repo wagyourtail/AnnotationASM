@@ -156,64 +156,64 @@ public class MethodParser {
                     methodNode.instructions.add(new InsnNode((Integer) value));
                     break;
                 case "frame":
-                    methodNode.instructions.add(parseFrame(insn));
+                    methodNode.instructions.add(parseFrame((AnnotationNode) value));
                     break;
                 case "intVal":
-                    methodNode.instructions.add(parseIntInsn(insn));
+                    methodNode.instructions.add(parseIntInsn((AnnotationNode) value));
                     break;
                 case "var":
-                    methodNode.instructions.add(parseVarInsn(insn));
+                    methodNode.instructions.add(parseVarInsn((AnnotationNode) value));
                     break;
                 case "type":
-                    methodNode.instructions.add(parseTypeInsn(insn));
+                    methodNode.instructions.add(parseTypeInsn((AnnotationNode) value));
                     break;
                 case "field":
-                    methodNode.instructions.add(parseFieldInsn(insn));
+                    methodNode.instructions.add(parseFieldInsn((AnnotationNode) value));
                     break;
                 case "method":
-                    methodNode.instructions.add(parseMethodInsn(insn));
+                    methodNode.instructions.add(parseMethodInsn((AnnotationNode) value));
                     break;
                 case "invokeDynamic":
-                    methodNode.instructions.add(parseInvokeDynamicInsn(insn));
+                    methodNode.instructions.add(parseInvokeDynamicInsn((AnnotationNode) value));
                     break;
                 case "jump":
-                    methodNode.instructions.add(parseJumpInsn(insn, labelMap));
+                    methodNode.instructions.add(parseJumpInsn((AnnotationNode) value, labelMap));
                     break;
                 case "label":
                     methodNode.instructions.add(labelMap.computeIfAbsent((String) value, k -> new LabelNode()));
                     break;
                 case "ldc":
-                    methodNode.instructions.add(parseLdcInsn(insn));
+                    methodNode.instructions.add(parseLdcInsn((AnnotationNode) value));
                     break;
                 case "iinc":
-                    methodNode.instructions.add(parseIincInsn(insn));
+                    methodNode.instructions.add(parseIincInsn((AnnotationNode) value));
                     break;
                 case "tableSwitch":
-                    methodNode.instructions.add(parseTableSwitchInsn(insn, labelMap));
+                    methodNode.instructions.add(parseTableSwitchInsn((AnnotationNode) value, labelMap));
                     break;
                 case "lookupSwitch":
-                    methodNode.instructions.add(parseLookupSwitchInsn(insn, labelMap));
+                    methodNode.instructions.add(parseLookupSwitchInsn((AnnotationNode) value, labelMap));
                     break;
                 case "multiANewArray":
-                    methodNode.instructions.add(parseMultiANewArrayInsn(insn));
+                    methodNode.instructions.add(parseMultiANewArrayInsn((AnnotationNode) value));
                     break;
                 case "annotation":
                     throw new UnsupportedOperationException("Annotation not supported yet");
 //                    methodNode.instructions.add(parseAnnotationInsn(insn));
                 case "tryCatchBlock":
-                    methodNode.tryCatchBlocks.add(parseTryCatchBlock(insn, labelMap));
+                    methodNode.tryCatchBlocks.add(parseTryCatchBlock((AnnotationNode) value, labelMap));
                     break;
                 case "localVariable":
-                    methodNode.localVariables.add(parseLocalVariable(insn, labelMap));
+                    methodNode.localVariables.add(parseLocalVariable((AnnotationNode) value, labelMap));
                     break;
                 case "localVariableAnnotation":
-                    methodNode.visibleLocalVariableAnnotations.add(parseLocalVariableAnnotation(insn));
+                    methodNode.visibleLocalVariableAnnotations.add(parseLocalVariableAnnotation((AnnotationNode) value));
                     break;
                 case "lineNumber":
-                    methodNode.instructions.add(parseLineNumber(insn));
+                    methodNode.instructions.add(parseLineNumber((AnnotationNode) value));
                     break;
                 case "maxs":
-                    parseMaxs(insn, methodNode);
+                    parseMaxs((AnnotationNode) value, methodNode);
                     break;
             }
         }
