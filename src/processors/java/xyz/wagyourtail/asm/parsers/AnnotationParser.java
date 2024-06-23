@@ -55,10 +55,28 @@ public class AnnotationParser {
     public static Map<String, List<Object>> parseArrayValues(List<AnnotationNode> arrayValues) {
         Map<String, List<Object>> map = new HashMap<>();
         for (AnnotationNode value : arrayValues) {
-            String key = (String) value.values.get(0);
-            List<Object> parsed = new ArrayList<>();
-            for (AnnotationNode annotationNode : (List<AnnotationNode>) value.values.get(1)) {
-                parsed.add(parseValue(annotationNode));
+            String key = null;
+            List<Object> parsed = null;
+            for (int i = 0; i < value.values.size(); i += 2) {
+                String k = (String) value.values.get(i);
+                Object v = value.values.get(i + 1);
+                switch (k) {
+                    case "key":
+                        key = (String) v;
+                        break;
+                    case "value":
+                        parsed = new ArrayList<>();
+                        for (AnnotationNode annotationNode : (List<AnnotationNode>) v) {
+                            parsed.add(parseValue(annotationNode));
+                        }
+                        break;
+                }
+            }
+            if (key == null) {
+                throw new IllegalArgumentException("AnnotationASM.ArrayValue must have a key");
+            }
+            if (parsed == null) {
+                throw new IllegalArgumentException("AnnotationASM.ArrayValue must have a value");
             }
             map.put(key, parsed);
         }
@@ -68,9 +86,27 @@ public class AnnotationParser {
     public static Map<String, Object> parseValues(List<AnnotationNode> values) {
         Map<String, Object> map = new HashMap<>();
         for (AnnotationNode value : values) {
-            String key = (String) value.values.get(0);
-            Object val = value.values.get(1);
-            map.put(key, parseValue(value));
+            String key = null;
+            Object parsed = null;
+            for (int i = 0; i < value.values.size(); i += 2) {
+                String k = (String) value.values.get(i);
+                Object v = value.values.get(i + 1);
+                switch (k) {
+                    case "key":
+                        key = (String) v;
+                        break;
+                    case "value":
+                        parsed = parseValue((AnnotationNode) v);
+                        break;
+                }
+            }
+            if (key == null) {
+                throw new IllegalArgumentException("AnnotationASM.KeyValue must have a key");
+            }
+            if (parsed == null) {
+                throw new IllegalArgumentException("AnnotationASM.KeyValue must have a value");
+            }
+            map.put(key, parsed);
         }
         return map;
     }
