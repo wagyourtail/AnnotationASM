@@ -35,7 +35,7 @@ abstract class AnnotationASMJar : Jar() {
                 }
                 from(project.zipTree(output))
             } else if (input.exists()) {
-                throw IllegalStateException("ExpectPlatformJar: $input is not a directory or jar file")
+                throw IllegalStateException("AnnotationASMJar: $input is not a directory or jar file")
 
             }
         }
