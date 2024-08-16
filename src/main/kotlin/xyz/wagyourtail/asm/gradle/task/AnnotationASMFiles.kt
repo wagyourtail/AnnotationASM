@@ -7,8 +7,8 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import xyz.wagyourtail.asm.PathProcessor
 import xyz.wagyourtail.asm.gradle.utils.openZipFileSystem
-import xyz.wagyourtail.unimined.expect.utils.FinalizeOnRead
-import xyz.wagyourtail.unimined.expect.utils.MustSet
+import xyz.wagyourtail.asm.gradle.utils.FinalizeOnRead
+import xyz.wagyourtail.asm.gradle.utils.MustSet
 import java.io.File
 import java.nio.file.FileSystem
 import kotlin.io.path.exists

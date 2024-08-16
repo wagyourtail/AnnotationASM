@@ -1,4 +1,4 @@
-package xyz.wagyourtail.unimined.expect.utils
+package xyz.wagyourtail.asm.gradle.utils
 
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

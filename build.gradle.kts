@@ -127,7 +127,7 @@ gradlePlugin {
     plugins {
         create("annotationasm") {
             id = "xyz.wagyourtail.annotationasm"
-            implementationClass = "xyz.wagyourtail.asm.AnnotationASMPlugin"
+            implementationClass = "xyz.wagyourtail.asm.gradle.AnnotationASMPlugin"
         }
     }
 }

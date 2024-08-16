@@ -3,7 +3,7 @@ package xyz.wagyourtail.asm.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
-import xyz.wagyourtail.unimined.expect.task.AnnotationASMJar
+import xyz.wagyourtail.asm.gradle.task.AnnotationASMJar
 
 abstract class AnnotationASMPlugin : Plugin<Project> {
 

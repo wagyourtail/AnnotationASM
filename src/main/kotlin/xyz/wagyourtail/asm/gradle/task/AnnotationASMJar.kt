@@ -1,6 +1,6 @@
 @file:Suppress("LeakingThis")
 
-package xyz.wagyourtail.unimined.expect.task
+package xyz.wagyourtail.asm.gradle.task
 
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
@@ -8,8 +8,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 import xyz.wagyourtail.asm.PathProcessor
 import xyz.wagyourtail.asm.gradle.utils.openZipFileSystem
-import xyz.wagyourtail.unimined.expect.utils.FinalizeOnRead
-import xyz.wagyourtail.unimined.expect.utils.MustSet
+import xyz.wagyourtail.asm.gradle.utils.FinalizeOnRead
+import xyz.wagyourtail.asm.gradle.utils.MustSet
 
 abstract class AnnotationASMJar : Jar() {
 
