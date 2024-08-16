@@ -55,12 +55,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(processAnnotations.get().outputs.files)
 
-    val annotationsImplementation by configurations.getting
+    val annotationsApi by configurations.getting
 
     // just for Opcodes, really
-    annotationsImplementation(implementation("org.ow2.asm:asm:9.7")!!)
+    annotationsApi(api("org.ow2.asm:asm:9.7")!!)
     implementation("org.ow2.asm:asm-commons:9.7")
     implementation("org.ow2.asm:asm-tree:9.7")
+    compileOnly("org.ow2.asm:asm-util:9.7")
 
     implementation(gradleApi())
 }
@@ -102,7 +103,14 @@ val processTest by tasks.registering(JavaExec::class) {
     )
 }
 
+tasks.compileTestJava {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
 tasks.test {
+    executable = "/usr/lib/jvm/java-17-openjdk/bin/java"
     dependsOn(processTest)
     useJUnitPlatform()
     classpath = sourceSets.test.get().runtimeClasspath - sourceSets.test.get().output + processTest.get().outputs.files

@@ -28,7 +28,7 @@ public @interface InvokeDynamicInsn {
 
         ClassRef classRef() default @ClassRef();
 
-        MethodRef methodRef() default @MethodRef(name = "", desc = @MethodRef.Desc(returnType = @ClassRef(), args = {}));
+        MethodRef.Desc methodDesc() default @MethodRef.Desc(returnType = @ClassRef(), args = {});
 
         Handle handle() default @Handle(tag = 0);
 

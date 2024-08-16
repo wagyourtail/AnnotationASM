@@ -3,6 +3,7 @@ package xyz.wagyourtail.asm.annotations.md;
 import org.objectweb.asm.Opcodes;
 import xyz.wagyourtail.asm.annotations.AnnotationASM;
 import xyz.wagyourtail.asm.annotations.md.insn.*;
+import xyz.wagyourtail.asm.annotations.md.shared.ConstantDynamic;
 import xyz.wagyourtail.asm.annotations.md.shared.Handle;
 import xyz.wagyourtail.asm.annotations.ref.ClassRef;
 import xyz.wagyourtail.asm.annotations.ref.FieldRef;
@@ -180,6 +181,7 @@ public @interface InsnNode {
         String stringValue() default "";
         ClassRef classValue() default @ClassRef();
         Handle handleValue() default @Handle(tag = 0);
+        ConstantDynamic constantDynamicValue() default @ConstantDynamic(name = "", desc = @ClassRef(), bsm = @Handle(tag = 0));
     }
 
 }

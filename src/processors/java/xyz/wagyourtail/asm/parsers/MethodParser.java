@@ -1,7 +1,10 @@
 package xyz.wagyourtail.asm.parsers;
 
+import org.objectweb.asm.ConstantDynamic;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import xyz.wagyourtail.asm.MemberNameAndDesc;
 import xyz.wagyourtail.asm.QualifiedMemberNameAndDesc;
 import xyz.wagyourtail.asm.parsers.ref.ClassRefParser;
 import xyz.wagyourtail.asm.parsers.ref.FieldRefParser;
@@ -316,7 +319,7 @@ public class MethodParser {
                 case "opcode":
                     opcode = (Integer) val;
                     break;
-                case "var":
+                case "value":
                     var = (Integer) val;
                     break;
             }
@@ -392,7 +395,7 @@ public class MethodParser {
                 case "method":
                     method = MethodRefParser.parseQualifiedMethodRef((AnnotationNode) val);
                     break;
-                case "itf":
+                case "isInterface":
                     itf = (Boolean) val;
                     break;
             }
@@ -410,7 +413,146 @@ public class MethodParser {
     }
 
     public static InvokeDynamicInsnNode parseInvokeDynamicInsn(AnnotationNode insn) {
-        throw new UnsupportedOperationException("InvokeDynamicInsn not supported yet");
+        MemberNameAndDesc targetName = null;
+        Handle bsm = null;
+        List<Object> bsmArgs = null;
+        for (int i = 0; i < insn.values.size(); i += 2) {
+            String key = (String) insn.values.get(i);
+            Object val = insn.values.get(i + 1);
+            switch (key) {
+                case "targetName":
+                    targetName = MethodRefParser.parseMethodRef((AnnotationNode) val);
+                    break;
+                case "bsm":
+                    bsm = parseHandle((AnnotationNode) val);
+                    break;
+                case "bsmArgs":
+                    List<AnnotationNode> args = (List<AnnotationNode>) val;
+                    bsmArgs = new ArrayList<>();
+                    for (AnnotationNode arg : args) {
+                        bsmArgs.add(parseBSMArg(arg));
+                    }
+                    break;
+            }
+        }
+        if (targetName == null) {
+            throw new IllegalArgumentException("InvokeDynamicInsn annotation must have a targetName");
+        }
+        if (bsm == null) {
+            throw new IllegalArgumentException("InvokeDynamicInsn annotation must have a bsm");
+        }
+        if (bsmArgs == null) {
+            bsmArgs = new ArrayList<>();
+        }
+        return new InvokeDynamicInsnNode(targetName.name, targetName.desc.getDescriptor(), bsm, bsmArgs.toArray());
+    }
+
+    public static Object parseBSMArg(AnnotationNode bsmArg) {
+        if (bsmArg.values.size() != 2) {
+            throw new IllegalArgumentException("Invalid BSMArg, must only have 1 key and 1 value");
+        }
+        String key = (String) bsmArg.values.get(0);
+        Object val = bsmArg.values.get(1);
+        switch (key) {
+            case "intValue":
+                return (Integer) val;
+            case "longValue":
+                return (Long) val;
+            case "floatValue":
+                return (Float) val;
+            case "doubleValue":
+                return (Double) val;
+            case "stringValue":
+                return (String) val;
+            case "classRef":
+                return ClassRefParser.parseClassRef((AnnotationNode) val);
+            case "methodRef":
+                return MethodRefParser.parseMethodDesc((AnnotationNode) val);
+            case "handle":
+                return parseHandle((AnnotationNode) val);
+            case "constantDynamic":
+                return parseConstantDynamic((AnnotationNode) val);
+        }
+        throw new IllegalArgumentException("Invalid BSMArg key: " + key);
+    }
+
+    public static ConstantDynamic parseConstantDynamic(AnnotationNode constantDynamic) {
+        String name = null;
+        Type desc = null;
+        Handle bsm = null;
+        List<Object> bsmArgs = null;
+
+        for (int i = 0; i < constantDynamic.values.size(); i += 2) {
+            String key = (String) constantDynamic.values.get(i);
+            Object val = constantDynamic.values.get(i + 1);
+            switch (key) {
+                case "name":
+                    name = (String) val;
+                    break;
+                case "desc":
+                    desc = ClassRefParser.parseClassRef((AnnotationNode) val);
+                    break;
+                case "bsm":
+                    bsm = parseHandle((AnnotationNode) val);
+                    break;
+                case "bsmArgs":
+                    List<AnnotationNode> args = (List<AnnotationNode>) val;
+                    bsmArgs = new ArrayList<>();
+                    for (AnnotationNode arg : args) {
+                        bsmArgs.add(parseBSMArg(arg));
+                    }
+                    break;
+            }
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("ConstantDynamic annotation must have a name");
+        }
+        if (desc == null) {
+            throw new IllegalArgumentException("ConstantDynamic annotation must have a desc");
+        }
+        if (bsm == null) {
+            throw new IllegalArgumentException("ConstantDynamic annotation must have a bsm");
+        }
+        if (bsmArgs == null) {
+            bsmArgs = new ArrayList<>();
+        }
+        return new ConstantDynamic(name, desc.getDescriptor(), bsm, bsmArgs.toArray());
+    }
+
+    public static Handle parseHandle(AnnotationNode handle) {
+        Integer tag = null;
+        QualifiedMemberNameAndDesc method = null;
+        Boolean itf = Boolean.FALSE;
+        for (int i = 0; i < handle.values.size(); i += 2) {
+            String key = (String) handle.values.get(i);
+            Object val = handle.values.get(i + 1);
+            switch (key) {
+                case "tag":
+                    tag = (Integer) val;
+                    break;
+                case "method":
+                    if (method != null) {
+                        throw new IllegalArgumentException("Handle annotation cannot have both a method and a field");
+                    }
+                    method = MethodRefParser.parseQualifiedMethodRef((AnnotationNode) val);
+                    break;
+                case "field":
+                    if (method != null) {
+                        throw new IllegalArgumentException("Handle annotation cannot have both a method and a field");
+                    }
+                    method = FieldRefParser.parseQualifiedFieldRef((AnnotationNode) val);
+                case "isInterface":
+                    itf = (Boolean) val;
+                    break;
+            }
+        }
+        if (tag == null) {
+            throw new IllegalArgumentException("Handle annotation must have a tag");
+        }
+        if (method == null) {
+            throw new IllegalArgumentException("Handle annotation must have a method or field");
+        }
+        return new Handle(tag, method.owner.getInternalName(), method.name, method.desc.getDescriptor(), itf);
     }
 
     public static JumpInsnNode parseJumpInsn(AnnotationNode insn, Map<String, LabelNode> labelMap) {
@@ -448,7 +590,9 @@ public class MethodParser {
             case "classValue":
                 return new LdcInsnNode(ClassRefParser.parseClassRef((AnnotationNode) val));
             case "handleValue":
-                throw new UnsupportedOperationException("HandleValue not supported yet");
+                return new LdcInsnNode(parseHandle((AnnotationNode) val));
+            case "constantDynamicValue":
+                return new LdcInsnNode(parseConstantDynamic((AnnotationNode) val));
         }
         return new LdcInsnNode(val);
     }
@@ -492,7 +636,7 @@ public class MethodParser {
                 case "max":
                     max = (Integer) val;
                     break;
-                case "dflt":
+                case "defaultLabel":
                     dflt = (String) val;
                     break;
                 case "labels":
