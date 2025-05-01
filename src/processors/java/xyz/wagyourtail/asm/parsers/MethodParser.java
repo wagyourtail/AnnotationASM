@@ -34,6 +34,13 @@ public class MethodParser {
                 case "signature":
                     methodNode.signature = (String) value;
                     break;
+                case "removeExceptions":
+                    if (methodNode.exceptions != null) {
+                        for (AnnotationNode exception : (List<AnnotationNode>) value) {
+                            methodNode.exceptions.remove(ClassRefParser.parseClassRef(exception).getInternalName());
+                        }
+                    }
+                    break;
                 case "addExceptions":
                     if (methodNode.exceptions == null) {
                         methodNode.exceptions = new ArrayList<>();
@@ -42,15 +49,36 @@ public class MethodParser {
                         methodNode.exceptions.add(ClassRefParser.parseClassRef(exception).getInternalName());
                     }
                     break;
-                case "removeExceptions":
-                    if (methodNode.exceptions != null) {
-                        for (AnnotationNode exception : (List<AnnotationNode>) value) {
-                            methodNode.exceptions.remove(ClassRefParser.parseClassRef(exception).getInternalName());
+                case "parameters":
+                    throw new UnsupportedOperationException("Parameters not supported yet");
+                case "removeVisibleAnnotations":
+                    if (methodNode.visibleAnnotations != null) {
+                        for (AnnotationNode visibleAnnotation : (List<AnnotationNode>) value) {
+                            methodNode.visibleAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(visibleAnnotation).getDescriptor()));
                         }
                     }
                     break;
-                case "parameters":
-                    throw new UnsupportedOperationException("Parameters not supported yet");
+                case "removeInvisibleAnnotations":
+                    if (methodNode.invisibleAnnotations != null) {
+                        for (AnnotationNode invisibleAnnotation : (List<AnnotationNode>) value) {
+                            methodNode.invisibleAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(invisibleAnnotation).getDescriptor()));
+                        }
+                    }
+                    break;
+                case "removeVisibleTypeAnnotations":
+                    if (methodNode.visibleTypeAnnotations != null) {
+                        for (AnnotationNode visibleTypeAnnotation : (List<AnnotationNode>) value) {
+                            methodNode.visibleTypeAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(visibleTypeAnnotation).getDescriptor()));
+                        }
+                    }
+                    break;
+                case "removeInvisibleTypeAnnotations":
+                    if (methodNode.invisibleTypeAnnotations != null) {
+                        for (AnnotationNode invisibleTypeAnnotation : (List<AnnotationNode>) value) {
+                            methodNode.invisibleTypeAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(invisibleTypeAnnotation).getDescriptor()));
+                        }
+                    }
+                    break;
                 case "addVisibleAnnotations":
                     if (methodNode.visibleAnnotations == null) {
                         methodNode.visibleAnnotations = new ArrayList<>();
@@ -81,34 +109,6 @@ public class MethodParser {
                     }
                     for (AnnotationNode invisibleTypeAnnotation : (List<AnnotationNode>) value) {
                         methodNode.invisibleTypeAnnotations.add(TypeAnnotationParser.parseTypeAnnotationASM(invisibleTypeAnnotation));
-                    }
-                    break;
-                case "removeVisibleAnnotations":
-                    if (methodNode.visibleAnnotations != null) {
-                        for (AnnotationNode visibleAnnotation : (List<AnnotationNode>) value) {
-                            methodNode.visibleAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(visibleAnnotation).getDescriptor()));
-                        }
-                    }
-                    break;
-                case "removeInvisibleAnnotations":
-                    if (methodNode.invisibleAnnotations != null) {
-                        for (AnnotationNode invisibleAnnotation : (List<AnnotationNode>) value) {
-                            methodNode.invisibleAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(invisibleAnnotation).getDescriptor()));
-                        }
-                    }
-                    break;
-                case "removeVisibleTypeAnnotations":
-                    if (methodNode.visibleTypeAnnotations != null) {
-                        for (AnnotationNode visibleTypeAnnotation : (List<AnnotationNode>) value) {
-                            methodNode.visibleTypeAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(visibleTypeAnnotation).getDescriptor()));
-                        }
-                    }
-                    break;
-                case "removeInvisibleTypeAnnotations":
-                    if (methodNode.invisibleTypeAnnotations != null) {
-                        for (AnnotationNode invisibleTypeAnnotation : (List<AnnotationNode>) value) {
-                            methodNode.invisibleTypeAnnotations.removeIf(an -> an.desc.equals(ClassRefParser.parseClassRef(invisibleTypeAnnotation).getDescriptor()));
-                        }
                     }
                     break;
                 case "annotationDefault":

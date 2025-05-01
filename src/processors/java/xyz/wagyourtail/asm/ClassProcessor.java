@@ -61,23 +61,11 @@ public class ClassProcessor {
                     classNode.outerMethod = member.name;
                     classNode.outerMethodDesc = member.desc.getDescriptor();
                     break;
-                case "addVisibleAnnotation":
-                    classNode.visibleAnnotations.add(AnnotationParser.parseAnnotationASM((AnnotationNode) value));
-                    break;
-                case "addInvisibleAnnotation":
-                    classNode.invisibleAnnotations.add(AnnotationParser.parseAnnotationASM((AnnotationNode) value));
-                    break;
                 case "removeVisibleAnnotation":
                     classNode.visibleAnnotations.removeIf(annotationNode -> annotationNode.desc.equals(ClassRefParser.parseClassRef((AnnotationNode) value).getDescriptor()));
                     break;
                 case "removeInvisibleAnnotation":
                     classNode.invisibleAnnotations.removeIf(annotationNode -> annotationNode.desc.equals(ClassRefParser.parseClassRef((AnnotationNode) value).getDescriptor()));
-                    break;
-                case "addVisibleTypeAnnotation":
-                    classNode.visibleTypeAnnotations.add(TypeAnnotationParser.parseTypeAnnotationASM((AnnotationNode) value));
-                    break;
-                case "addInvisibleTypeAnnotation":
-                    classNode.invisibleTypeAnnotations.add(TypeAnnotationParser.parseTypeAnnotationASM((AnnotationNode) value));
                     break;
                 case "removeVisibleTypeAnnotation":
                     classNode.visibleTypeAnnotations.removeIf(typeAnnotationNode -> typeAnnotationNode.desc.equals(ClassRefParser.parseClassRef((AnnotationNode) value).getDescriptor()));
@@ -85,32 +73,39 @@ public class ClassProcessor {
                 case "removeInvisibleTypeAnnotation":
                     classNode.invisibleTypeAnnotations.removeIf(typeAnnotationNode -> typeAnnotationNode.desc.equals(ClassRefParser.parseClassRef((AnnotationNode) value).getDescriptor()));
                     break;
-                case "addInnerClasses":
-                    for (AnnotationNode innerClassNode : (List<AnnotationNode>) value) {
-                        classNode.innerClasses.add(InnerClassParser.parseInnerClassASM(innerClassNode));
-                    }
+                case "addVisibleAnnotation":
+                    classNode.visibleAnnotations.add(AnnotationParser.parseAnnotationASM((AnnotationNode) value));
+                    break;
+                case "addInvisibleAnnotation":
+                    classNode.invisibleAnnotations.add(AnnotationParser.parseAnnotationASM((AnnotationNode) value));
+                    break;
+                case "addVisibleTypeAnnotation":
+                    classNode.visibleTypeAnnotations.add(TypeAnnotationParser.parseTypeAnnotationASM((AnnotationNode) value));
+                    break;
+                case "addInvisibleTypeAnnotation":
+                    classNode.invisibleTypeAnnotations.add(TypeAnnotationParser.parseTypeAnnotationASM((AnnotationNode) value));
                     break;
                 case "removeInnerClasses":
                     for (AnnotationNode innerClassNode : (List<AnnotationNode>) value) {
                         classNode.innerClasses.removeIf(innerClass -> innerClass.name.equals(ClassRefParser.parseClassRef(innerClassNode).getInternalName()));
                     }
                     break;
+                case "addInnerClasses":
+                    for (AnnotationNode innerClassNode : (List<AnnotationNode>) value) {
+                        classNode.innerClasses.add(InnerClassParser.parseInnerClassASM(innerClassNode));
+                    }
+                    break;
                 case "nestHost":
                     classNode.nestHostClass = ClassRefParser.parseClassRef((AnnotationNode) value).getInternalName();
-                    break;
-                case "addNestMembers":
-                    for (AnnotationNode nestMemberNode : (List<AnnotationNode>) value) {
-                        classNode.nestMembers.add(ClassRefParser.parseClassRef(nestMemberNode).getInternalName());
-                    }
                     break;
                 case "removeNestMembers":
                     for (AnnotationNode nestMemberNode : (List<AnnotationNode>) value) {
                         classNode.nestMembers.remove(ClassRefParser.parseClassRef(nestMemberNode).getInternalName());
                     }
                     break;
-                case "addPermittedSubclasses":
-                    for (AnnotationNode permittedSubclassNode : (List<AnnotationNode>) value) {
-                        classNode.permittedSubclasses.add(ClassRefParser.parseClassRef(permittedSubclassNode).getInternalName());
+                case "addNestMembers":
+                    for (AnnotationNode nestMemberNode : (List<AnnotationNode>) value) {
+                        classNode.nestMembers.add(ClassRefParser.parseClassRef(nestMemberNode).getInternalName());
                     }
                     break;
                 case "removePermittedSubclasses":
@@ -118,9 +113,9 @@ public class ClassProcessor {
                         classNode.permittedSubclasses.remove(ClassRefParser.parseClassRef(permittedSubclassNode).getInternalName());
                     }
                     break;
-                case "addRecordComponents":
-                    for (AnnotationNode recordComponentNode : (List<AnnotationNode>) value) {
-                        classNode.recordComponents.add(RecordComponentParser.parseRecordComponent(recordComponentNode));
+                case "addPermittedSubclasses":
+                    for (AnnotationNode permittedSubclassNode : (List<AnnotationNode>) value) {
+                        classNode.permittedSubclasses.add(ClassRefParser.parseClassRef(permittedSubclassNode).getInternalName());
                     }
                     break;
                 case "removeRecordComponents":
@@ -128,9 +123,9 @@ public class ClassProcessor {
                         classNode.recordComponents.removeIf(recordComponent -> recordComponent.name.equals(recordComponentName));
                     }
                     break;
-                case "addFields":
-                    for (AnnotationNode fieldNode : (List<AnnotationNode>) value) {
-                        classNode.fields.add(FieldParser.parseField(fieldNode));
+                case "addRecordComponents":
+                    for (AnnotationNode recordComponentNode : (List<AnnotationNode>) value) {
+                        classNode.recordComponents.add(RecordComponentParser.parseRecordComponent(recordComponentNode));
                     }
                     break;
                 case "removeFields":
@@ -139,15 +134,20 @@ public class ClassProcessor {
                         classNode.fields.removeIf(field -> field.name.equals(fmember.name) && field.desc.equals(fmember.desc.getDescriptor()));
                     }
                     break;
-                case "addMethods":
-                    for (AnnotationNode methodNode : (List<AnnotationNode>) value) {
-                        classNode.methods.add(MethodParser.parseMethod(methodNode));
+                case "addFields":
+                    for (AnnotationNode fieldNode : (List<AnnotationNode>) value) {
+                        classNode.fields.add(FieldParser.parseField(fieldNode));
                     }
                     break;
                 case "removeMethods":
                     for (AnnotationNode methodNode : (List<AnnotationNode>) value) {
                         MemberNameAndDesc mmember = MethodRefParser.parseMethodRef(methodNode);
                         classNode.methods.removeIf(method -> method.name.equals(mmember.name) && method.desc.equals(mmember.desc.getDescriptor()));
+                    }
+                    break;
+                case "addMethods":
+                    for (AnnotationNode methodNode : (List<AnnotationNode>) value) {
+                        classNode.methods.add(MethodParser.parseMethod(methodNode));
                     }
                     break;
             }
