@@ -1,7 +1,7 @@
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version libs.versions.kotlin
     `java-gradle-plugin`
     `maven-publish`
 }
@@ -54,17 +54,18 @@ val processAnnotations by tasks.registering(JavaExec::class) {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(libs.junit.jupiter)
     testImplementation(processAnnotations.get().outputs.files)
 
     val annotationsApi by configurations.getting
 
     // just for Opcodes, really
-    annotationsApi(api("org.ow2.asm:asm:9.7")!!)
-    implementation("org.ow2.asm:asm-commons:9.7")
-    implementation("org.ow2.asm:asm-tree:9.7")
-    compileOnly("org.ow2.asm:asm-util:9.7")
+    annotationsApi(libs.asm)
+
+    api(libs.asm)
+    implementation(libs.asm.commons)
+    implementation(libs.asm.tree)
+    compileOnly(libs.asm.util)
 
     implementation(gradleApi())
 }
@@ -73,6 +74,17 @@ val annotationsJar by tasks.registering(Jar::class) {
     dependsOn(processAnnotations)
     archiveBaseName.set("annotationasm-annotations")
     from(processAnnotations.get().outputs.files)
+
+    manifest {
+        attributes.putAll(
+            mapOf(
+                "Manifest-Version" to "1.0",
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version,
+                "Automatic-Module-Name" to "xyz.wagyourtail.annotationasm.annotations"
+            )
+        )
+    }
 }
 
 tasks.jar {
@@ -86,6 +98,7 @@ tasks.jar {
                 "Manifest-Version" to "1.0",
                 "Implementation-Title" to project.name,
                 "Implementation-Version" to project.version,
+                "Automatic-Module-Name" to "xyz.wagyourtail.annotationasm"
             )
         )
     }

@@ -1,0 +1,16 @@
+[versions]
+asm = "9.9.1"
+kotlin = "2.2.0"
+
+junit = "5.13.4"
+
+[libraries]
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm_commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asm_util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+asm_analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
+asm_tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+
+junit_jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit_jupiter_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit_platform_launcher = { module = "org.junit.platform:junit-platform-launcher" }
